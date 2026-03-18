@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f0a08">
+<title>FoodFair Meat Dept — Now Serving</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0f0a08;
+    color: #f5e6d3;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    text-align: center;
+  }
+
+  .logo-wrap {
+    margin-bottom: 24px;
+  }
+
+  .store-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.15em;
+    color: #f5a623;
+  }
+
+  .dept-name {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #e8431a;
+    text-transform: uppercase;
+    margin-top: -4px;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: #3a2010;
+    margin: 24px auto;
+    border-radius: 2px;
+  }
+
+  .label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: #8a6a50;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 140px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: #e8431a;
+    text-shadow: 0 0 60px rgba(232,67,26,0.3);
+    transition: all 0.4s ease;
+  }
+
+  .number.pulse {
+    animation: pulse 0.5s ease;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(0.85); opacity: 0.4; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+
+  .status {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8a6a50;
+    letter-spacing: 0.05em;
+  }
+
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    margin-right: 6px;
+    box-shadow: 0 0 8px #4caf50;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  .footer {
+    margin-top: 48px;
+    font-size: 12px;
+    color: #5a3a25;
+    line-height: 2;
+  }
+
+  .connecting {
+    font-size: 16px;
+    color: #8a6a50;
+    margin-top: 16px;
+    animation: fade 1.2s infinite alternate;
+  }
+
+  @keyframes fade {
+    from { opacity: 0.4; }
+    to   { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="logo-wrap">
+  <div class="store-name">FOODFAIR</div>
+  <div class="dept-name">Meat Department</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="label">Now Serving</div>
+<div class="number" id="nowServing">—</div>
+<div class="status" id="status"><span class="connecting">Connecting...</span></div>
+
+<div class="footer">
+  Please wait for your number to be called<br>
+  Espere a que llamen su número<br>
+  Tanpri tann yo rele nimewo ou
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDi6oEKmZ6B6r9_wPk8nMIzr23hEX-5Y8",
+    authDomain: "foodfair-meat.firebaseapp.com",
+    databaseURL: "https://foodfair-meat-default-rtdb.firebaseio.com",
+    projectId: "foodfair-meat",
+    storageBucket: "foodfair-meat.firebasestorage.app",
+    messagingSenderId: "183879584210",
+    appId: "1:183879584210:web:52daf9dac7e40f8dd9a00b",
+    measurementId: "G-7XZ2DWHFN9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const numEl    = document.getElementById('nowServing');
+  const statusEl = document.getElementById('status');
+
+  db.ref('meat/current').on('value', snap => {
+    const data = snap.val();
+    if (data && data.number) {
+      numEl.textContent = data.number;
+      numEl.classList.remove('pulse');
+      void numEl.offsetWidth;
+      numEl.classList.add('pulse');
+      statusEl.innerHTML = '<span class="dot"></span>Live — updating automatically';
+    } else {
+      numEl.textContent = '—';
+      statusEl.innerHTML = '<span style="color:#8a6a50">Waiting for first number...</span>';
+    }
+  });
+</script>
+</body>
+</html>
