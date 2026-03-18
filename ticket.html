@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>FoodFair Meat Dept — Your Ticket</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+  }
+
+  .ticket {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 340px;
+    padding: 32px 24px 28px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .store {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.15em;
+    color: #111;
+    line-height: 1;
+  }
+
+  .dept {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #555;
+    text-transform: uppercase;
+    margin-top: 2px;
+    margin-bottom: 24px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 0 0 24px;
+  }
+
+  .your-number-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: #555;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    line-height: 1;
+    color: #111;
+    letter-spacing: 0.04em;
+  }
+
+  .datetime {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+    margin: 8px 0 20px;
+    padding: 0 4px;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: #666;
+    line-height: 2;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+  }
+
+  /* Loading state */
+  .loading {
+    font-size: 16px;
+    color: #999;
+    padding: 40px 0;
+    animation: pulse 1.2s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { opacity: 0.4; }
+    to   { opacity: 1; }
+  }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #16a34a;
+    margin-bottom: 20px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  .now-serving {
+    font-size: 12px;
+    color: #999;
+    margin-top: 16px;
+  }
+
+  .now-serving span {
+    font-weight: 700;
+    color: #e8431a;
+  }
+
+  .error {
+    color: #e8431a;
+    font-size: 14px;
+    padding: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="ticket" id="ticketCard">
+  <div class="store">FOODFAIR</div>
+  <div class="dept">Meat Department</div>
+  <hr class="divider">
+  <div class="loading" id="loadingMsg">Getting your number...</div>
+  <div id="ticketContent" style="display:none;">
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      Digital Ticket
+    </div>
+    <div class="your-number-label">Your Number</div>
+    <div class="number" id="myNumber">—</div>
+    <div class="datetime">
+      <span id="ticketDate">—</span>
+      <span id="ticketTime">—</span>
+    </div>
+    <div class="now-serving">Now serving: <span id="nowServing">—</span></div>
+    <div class="footer-text">
+      Please wait for your number to be called<br>
+      Espere a que llamen su número<br>
+      Tanpri tann yo rele nimewo ou
+    </div>
+  </div>
+  <div id="errorMsg" class="error" style="display:none;">
+    Could not connect. Please try again.
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDi6oEKmZ6B6r9_wPk8nMIzr23hEX-5Y8",
+    authDomain: "foodfair-meat.firebaseapp.com",
+    databaseURL: "https://foodfair-meat-default-rtdb.firebaseio.com",
+    projectId: "foodfair-meat",
+    storageBucket: "foodfair-meat.firebasestorage.app",
+    messagingSenderId: "183879584210",
+    appId: "1:183879584210:web:52daf9dac7e40f8dd9a00b",
+    measurementId: "G-7XZ2DWHFN9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function pad(n) { return String(n).padStart(3, '0'); }
+
+  async function getMyNumber() {
+    try {
+      const queueRef = db.ref('meat/queue');
+
+      // Atomically increment the queue counter
+      const result = await queueRef.transaction(current => {
+        if (current === null) return 1;
+        if (current >= 999) return 1;
+        return current + 1;
+      });
+
+      if (result.committed) {
+        const myNum = result.snapshot.val();
+        const numStr = pad(myNum);
+
+        // Set date/time
+        const now = new Date();
+        document.getElementById('myNumber').textContent = numStr;
+        document.getElementById('ticketDate').textContent =
+          now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        document.getElementById('ticketTime').textContent =
+          now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        // Show ticket
+        document.getElementById('loadingMsg').style.display = 'none';
+        document.getElementById('ticketContent').style.display = 'block';
+
+        // Listen for now serving updates
+        db.ref('meat/current').on('value', snap => {
+          const data = snap.val();
+          document.getElementById('nowServing').textContent =
+            data && data.number ? data.number : '—';
+        });
+      }
+    } catch (err) {
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+  }
+
+  getMyNumber();
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FoodFair QR Sign</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f5f5f5;
+    font-family: 'Inter', sans-serif;
+  }
+  .sign {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 36px;
+    text-align: center;
+    width: 360px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  }
+  .store {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.15em;
+    color: #111;
+  }
+  .dept {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #e8431a;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .instruction {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .sub {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .qr-wrap {
+    background: white;
+    border: 2px solid #111;
+    border-radius: 12px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .url {
+    font-size: 11px;
+    color: #999;
+    word-break: break-all;
+    margin-top: 8px;
+  }
+  .langs {
+    font-size: 12px;
+    color: #888;
+    line-height: 2.2;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="sign">
+  <div class="store">FOODFAIR</div>
+  <div class="dept">Meat Department</div>
+  <div class="instruction">📱 Scan for your number</div>
+  <div class="sub">No paper needed — get your digital ticket instantly</div>
+  <div class="qr-wrap">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://radiogeneration893-bot.github.io/ticket/ticket.html" width="200" height="200" alt="QR Code">
+    <div class="url">radiogeneration893-bot.github.io/ticket/ticket.html</div>
+  </div>
+  <div class="langs">
+    Please wait for your number to be called<br>
+    Espere a que llamen su número<br>
+    Tanpri tann yo rele nimewo ou
+  </div>
+</div>
+</body>
+</html>
